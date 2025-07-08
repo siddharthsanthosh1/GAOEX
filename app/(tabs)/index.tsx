@@ -1,74 +1,251 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function HomeScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+
+  const achievements = [
+    { number: '500+', label: 'Organizations' },
+    { number: '10,000+', label: 'Students' },
+    { number: '100+', label: 'Trainers' },
+  ];
+
+  const featuredPrograms = [
+    {
+      title: 'Global Career Counseling',
+      description: 'Guidance in college admission process, career advice, and psychometric tests',
+      icon: '🎯',
+    },
+    {
+      title: 'Educational Research Project',
+      description: 'International cross-cultural trainings and improvised learning platforms',
+      icon: '🔬',
+    },
+    {
+      title: 'Student Empowerment',
+      description: 'Support for marginalized students regardless of background',
+      icon: '🌟',
+    },
+  ];
+
+  const openWebsite = () => {
+    Linking.openURL('https://www.gaoex.org');
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Hero Section */}
+      <LinearGradient
+        colors={[colors.primary, colors.accent]}
+        style={styles.heroSection}
+      >
+        <View style={styles.heroContent}>
+          <ThemedText style={styles.heroTitle}>Global Academy Of Excellence</ThemedText>
+          <ThemedText style={styles.heroSubtitle}>
+            Empowering minds across the globe through quality education
+          </ThemedText>
+          <TouchableOpacity style={styles.ctaButton} onPress={openWebsite}>
+            <ThemedText style={styles.ctaButtonText}>Visit Website</ThemedText>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+
+      {/* Achievements Section */}
+      <ThemedView style={styles.section}>
+        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+          Center Achievements
+        </ThemedText>
+        <View style={styles.achievementsContainer}>
+          {achievements.map((achievement, index) => (
+            <View key={index} style={[styles.achievementCard, { backgroundColor: colors.card }]}>
+              <ThemedText style={[styles.achievementNumber, { color: colors.primary }]}>
+                {achievement.number}
+              </ThemedText>
+              <ThemedText style={[styles.achievementLabel, { color: colors.text }]}>
+                {achievement.label}
+              </ThemedText>
+            </View>
+          ))}
+        </View>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Skibdi Toilet</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
+
+      {/* Featured Programs */}
+      <ThemedView style={styles.section}>
+        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+          Featured Programs
+        </ThemedText>
+        {featuredPrograms.map((program, index) => (
+          <View key={index} style={[styles.programCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={styles.programHeader}>
+              <ThemedText style={styles.programIcon}>{program.icon}</ThemedText>
+              <ThemedText style={[styles.programTitle, { color: colors.text }]}>
+                {program.title}
+              </ThemedText>
+            </View>
+            <ThemedText style={[styles.programDescription, { color: colors.icon }]}>
+              {program.description}
+            </ThemedText>
+          </View>
+        ))}
+      </ThemedView>
+
+      {/* Founder Quote */}
+      <ThemedView style={[styles.quoteSection, { backgroundColor: colors.card }]}>
+        <ThemedText style={[styles.quoteText, { color: colors.text }]}>
+          "Education has potential answers to all problems. Transfer of knowledge or imparting of education is the need of the hour to every deserving individual to obtain a deserved education which is uncategorized by money, race or caste or by any other social status."
+        </ThemedText>
+        <ThemedText style={[styles.quoteAuthor, { color: colors.primary }]}>
+          — PRASHITHA AVINASH
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+
+      {/* Awards Section */}
+      <ThemedView style={styles.section}>
+        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+          Recognition & Awards
         </ThemedText>
+        <View style={[styles.awardsContainer, { backgroundColor: colors.card }]}>
+          <ThemedText style={[styles.awardItem, { color: colors.text }]}>
+            🏆 ISO Certified Educational Organization
+          </ThemedText>
+          <ThemedText style={[styles.awardItem, { color: colors.text }]}>
+            ⭐ 5 Star Google Rated (GMB)
+          </ThemedText>
+          <ThemedText style={[styles.awardItem, { color: colors.text }]}>
+            🏅 Asian Award Winner 2022
+          </ThemedText>
+          <ThemedText style={[styles.awardItem, { color: colors.text }]}>
+            🎓 Students Choice Award 2022-2023
+          </ThemedText>
+        </View>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  heroSection: {
+    paddingTop: 60,
+    paddingBottom: 40,
+    paddingHorizontal: 20,
+  },
+  heroContent: {
+    alignItems: 'center',
+  },
+  heroTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 20,
+    opacity: 0.9,
+  },
+  ctaButton: {
+    backgroundColor: 'white',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 25,
+  },
+  ctaButtonText: {
+    color: '#1e40af',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  section: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  achievementsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  achievementCard: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 20,
+    marginHorizontal: 5,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  achievementNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  achievementLabel: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  programCard: {
+    padding: 20,
+    marginBottom: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  programHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  programIcon: {
+    fontSize: 24,
+    marginRight: 12,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  programTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    flex: 1,
+  },
+  programDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  quoteSection: {
+    margin: 20,
+    padding: 20,
+    borderRadius: 12,
+  },
+  quoteText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    lineHeight: 24,
+    marginBottom: 15,
+  },
+  quoteAuthor: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'right',
+  },
+  awardsContainer: {
+    padding: 20,
+    borderRadius: 12,
+  },
+  awardItem: {
+    fontSize: 16,
+    marginBottom: 10,
+    paddingLeft: 10,
   },
 });
