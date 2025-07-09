@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -39,11 +39,17 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
       {/* Hero Section */}
       <LinearGradient
         colors={[colors.primary, colors.accent]}
-        style={styles.heroSection}
+        style={[
+          styles.heroSection,
+          Platform.select({ ios: { paddingTop: 80 }, android: { paddingTop: 60 } }),
+        ]}
       >
         <View style={styles.heroContent}>
           <ThemedText style={styles.heroTitle}>Global Academy Of Excellence</ThemedText>
@@ -146,7 +152,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',
-    marginBottom: 10,
   },
   heroSubtitle: {
     fontSize: 16,
