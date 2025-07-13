@@ -2,79 +2,134 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onValue, ref, remove } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { auth, db } from '../../firebaseConfig';
 
 export default function MyEventsPage() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const [myEvents, setMyEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const loadEvents = async () => {
-    setLoading(true);
-    try {
-      const stored = await AsyncStorage.getItem('myEvents');
-      setMyEvents(stored ? JSON.parse(stored) : []);
-    } catch {
-      setMyEvents([]);
-    }
-    setLoading(false);
-  };
+  const [user, setUser] = useState(null);
+  const [profileVisible, setProfileVisible] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const unsubscribe = () => {
-      loadEvents();
-    };
-    loadEvents();
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    if (!user) {
+      setMyEvents([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError('');
+    const eventsRef = ref(db, `users/${user.uid}/events`);
+    const unsubscribe = onValue(eventsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setMyEvents(Object.values(data));
+      } else {
+        setMyEvents([]);
+      }
+      setLoading(false);
+    }, (err) => {
+      setError('You Currently Have No Events Registered');
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
   const handleRemove = async (event) => {
+    if (!user) return;
     Alert.alert('Remove Event', 'Are you sure you want to remove this event from My Events?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Remove', style: 'destructive', onPress: async () => {
-          const filtered = myEvents.filter(e => !(e.id === event.id && e.phone === event.phone));
-          await AsyncStorage.setItem('myEvents', JSON.stringify(filtered));
-          setMyEvents(filtered);
+          try {
+            await remove(ref(db, `users/${user.uid}/events/${event.id}`));
+            // setMyEvents handled by onValue
+          } catch {
+            Alert.alert('Error', 'Could not remove event.');
+          }
         }
       }
     ]);
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setProfileVisible(false);
+    } catch {
+      Alert.alert('Error', 'Could not log out.');
+    }
+  };
+
   if (loading) return <View style={[styles.container, { backgroundColor: colors.background }]}><ThemedText>Loading...</ThemedText></View>;
+  if (!user) return <View style={[styles.container, { backgroundColor: colors.background }]}><ThemedText>Please log in to view your events.</ThemedText></View>;
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
-      <ThemedView style={styles.header}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={styles.header}>
         <ThemedText style={[styles.title, { color: colors.text }]}>My Registered Events</ThemedText>
-      </ThemedView>
-      {myEvents.length === 0 ? (
+        <TouchableOpacity style={styles.profileIcon} onPress={() => setProfileVisible(true)}>
+          <Ionicons name="person-circle" size={32} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
+      {error ? (
+        <ThemedText style={{ color: 'red', textAlign: 'center' }}>{error}</ThemedText>
+      ) : myEvents.length === 0 ? (
         <ThemedText style={[styles.empty, { color: colors.icon }]}>You have not registered for any events yet.</ThemedText>
       ) : (
-        myEvents.map((event, idx) => (
-          <ThemedView key={event.id + event.phone + idx} style={[styles.eventCard, { backgroundColor: colors.card, borderColor: colors.border }]}> 
-            <ThemedText style={[styles.eventTitle, { color: colors.primary }]}>{event.title}</ThemedText>
-            <ThemedText style={[styles.eventDate, { color: colors.icon }]}>{event.date} | {event.time}</ThemedText>
-            <ThemedText style={[styles.eventLocation, { color: colors.text }]}>{event.location}</ThemedText>
-            <ThemedText style={[styles.eventDescription, { color: colors.text }]}>{event.description}</ThemedText>
-            <ThemedText style={[styles.userInfo, { color: colors.primary }]}>Registered as: {event.name} ({event.phone})</ThemedText>
-            <TouchableOpacity style={[styles.removeButton, { backgroundColor: colors.primary }]} onPress={() => handleRemove(event)}>
-              <ThemedText style={styles.removeButtonText}>Remove</ThemedText>
-            </TouchableOpacity>
-          </ThemedView>
-        ))
+        <ScrollView>
+          {myEvents.map((event, idx) => (
+            <ThemedView key={event.id + idx} style={[styles.eventCard, { backgroundColor: colors.card, borderColor: colors.border }]}> 
+              <ThemedText style={[styles.eventTitle, { color: colors.primary }]}>{event.title}</ThemedText>
+              <ThemedText style={[styles.eventDate, { color: colors.icon }]}>{event.date} | {event.time}</ThemedText>
+              <ThemedText style={[styles.eventLocation, { color: colors.text }]}>{event.location}</ThemedText>
+              <ThemedText style={[styles.eventDescription, { color: colors.text }]}>{event.description}</ThemedText>
+              <ThemedText style={[styles.userInfo, { color: colors.primary }]}>Registered as: {event.name} ({event.phone})</ThemedText>
+              <TouchableOpacity style={[styles.removeButton, { backgroundColor: colors.primary }]} onPress={() => handleRemove(event)}>
+                <ThemedText style={styles.removeButtonText}>Remove</ThemedText>
+              </TouchableOpacity>
+            </ThemedView>
+          ))}
+        </ScrollView>
       )}
-    </ScrollView>
+      <Modal visible={profileVisible} animationType="slide" transparent onRequestClose={() => setProfileVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.profileModal, { backgroundColor: colors.card }]}> 
+            <Ionicons name="person-circle" size={64} color={colors.primary} style={{ alignSelf: 'center', marginBottom: 12 }} />
+            <ThemedText style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 }}>Profile</ThemedText>
+            <ThemedText style={{ textAlign: 'center', marginBottom: 16 }}>{user.email}</ThemedText>
+            <TouchableOpacity style={[styles.logoutButton, { backgroundColor: colors.primary }]} onPress={handleLogout}>
+              <ThemedText style={styles.logoutButtonText}>Logout</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setProfileVisible(false)} style={{ marginTop: 12 }}>
+              <ThemedText style={{ color: colors.primary, textAlign: 'center' }}>Close</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { padding: 20, paddingTop: 60 },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 20, paddingTop: 60 },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center', flex: 1 },
+  profileIcon: { position: 'absolute', right: 20, top: 60 },
   empty: { fontSize: 16, textAlign: 'center', marginTop: 40 },
   eventCard: { padding: 20, margin: 20, marginTop: 0, borderRadius: 12, borderWidth: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
   eventTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 4 },
@@ -84,4 +139,8 @@ const styles = StyleSheet.create({
   userInfo: { fontSize: 14, marginBottom: 8 },
   removeButton: { paddingVertical: 8, borderRadius: 8, alignItems: 'center', marginTop: 8 },
   removeButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
+  profileModal: { width: 300, borderRadius: 16, padding: 24, alignItems: 'center' },
+  logoutButton: { width: '100%', padding: 14, borderRadius: 8, alignItems: 'center', marginTop: 8 },
+  logoutButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 }); 
