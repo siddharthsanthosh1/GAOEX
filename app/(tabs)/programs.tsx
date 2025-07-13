@@ -1,8 +1,6 @@
 import React from 'react';
-import { Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -69,107 +67,91 @@ export default function ProgramsScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ThemedView style={styles.header}>
-        <ThemedText style={[styles.headerTitle, { color: colors.text }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
+      <View style={styles.header}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}> 
           Programs & Awards
-        </ThemedText>
-        <ThemedText style={[styles.headerSubtitle, { color: colors.icon }]}>
+        </Text>
+        <Text style={[styles.headerSubtitle, { color: colors.icon }]}> 
           Discover opportunities for growth and recognition
-        </ThemedText>
-      </ThemedView>
+        </Text>
+      </View>
 
       {/* Current Programs */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}> 
           Current Programs
-        </ThemedText>
+        </Text>
         {programs.map((program, index) => (
-          <ThemedView key={index} style={[styles.programCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View key={index} style={[styles.programCard, { backgroundColor: colors.card, borderColor: colors.border }]}> 
             <View style={styles.programHeader}>
-              <ThemedText style={styles.programIcon}>{program.icon}</ThemedText>
+              <Text style={styles.programIcon}>{program.icon}</Text>
               <View style={styles.programTitleContainer}>
-                <ThemedText style={[styles.programTitle, { color: colors.text }]}>
+                <Text style={[styles.programTitle, { color: colors.text }]}> 
                   {program.title}
-                </ThemedText>
+                </Text>
                 <View style={[styles.statusBadge, { 
-                  backgroundColor: program.status.includes('Open') ? colors.success : colors.warning 
-                }]}>
-                  <ThemedText style={[styles.statusText, { color: 'white' }]}>
+                  backgroundColor: program.status.includes('Open') ? '#22c55e' : '#f59e42' // green for open, orange for closed
+                }]}> 
+                  <Text style={[styles.statusText, { color: 'white' }]}> 
                     {program.status}
-                  </ThemedText>
+                  </Text>
                 </View>
               </View>
             </View>
             
-            <ThemedText style={[styles.programDescription, { color: colors.icon }]}>
+            <Text style={[styles.programDescription, { color: colors.icon }]}> 
               {program.description}
-            </ThemedText>
+            </Text>
 
             <View style={styles.deadlineContainer}>
-              <ThemedText style={[styles.deadlineLabel, { color: colors.text }]}>
+              <Text style={[styles.deadlineLabel, { color: colors.text }]}> 
                 Deadline:
-              </ThemedText>
-              <ThemedText style={[styles.deadlineText, { color: colors.primary }]}>
+              </Text>
+              <Text style={[styles.deadlineText, { color: colors.primary }]}> 
                 {program.deadline}
-              </ThemedText>
+              </Text>
             </View>
-          </ThemedView>
+          </View>
         ))}
-      </ThemedView>
+      </View>
 
       {/* Awards & Recognition */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}> 
           Awards & Recognition
-        </ThemedText>
+        </Text>
         <View style={styles.awardsGrid}>
           {awards.map((award, index) => (
-            <ThemedView key={index} style={[styles.awardCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <ThemedText style={styles.awardIcon}>{award.icon}</ThemedText>
-              <ThemedText style={[styles.awardTitle, { color: colors.text }]}>
+            <View key={index} style={[styles.awardCard, { backgroundColor: colors.card, borderColor: colors.border }]}> 
+              <Text style={styles.awardIcon}>{award.icon}</Text>
+              <Text style={[styles.awardTitle, { color: colors.text }]}> 
                 {award.title}
-              </ThemedText>
-              <ThemedText style={[styles.awardDescription, { color: colors.icon }]}>
+              </Text>
+              <Text style={[styles.awardDescription, { color: colors.icon }]}> 
                 {award.description}
-              </ThemedText>
-            </ThemedView>
+              </Text>
+            </View>
           ))}
         </View>
-      </ThemedView>
+      </View>
 
       {/* Testimonials */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}> 
           What Our Students Say
-        </ThemedText>
-        <ThemedView style={[styles.testimonialCard, { backgroundColor: colors.card }]}> 
-          <ThemedText style={[styles.testimonialText, { color: colors.text }]}> 
+        </Text>
+        <View style={[styles.testimonialCard, { backgroundColor: colors.card }]}>  
+          <Text style={[styles.testimonialText, { color: colors.text }]}>  
             "It's the magic of Mrs. Prashitha Mam, an International Educationist, Founder/CEO of Global Academy Of Excellence who can read each student's mind and synchronizes to catch their focus and attention."
-          </ThemedText>
-          <ThemedText style={[styles.testimonialAuthor, { color: colors.primary }]}> 
+          </Text>
+          <Text style={[styles.testimonialAuthor, { color: colors.primary }]}>  
             — Dr. K.P.V Sabareesh
-          </ThemedText>
-        </ThemedView>
-      </ThemedView>
+          </Text>
+        </View>
+      </View>
 
-      {/* CTA Section */}
-      <ThemedView style={styles.ctaSection}>
-        <ThemedText style={[styles.ctaTitle, { color: colors.text }]}>
-          Ready to Join GAOEX?
-        </ThemedText>
-        <ThemedText style={[styles.ctaDescription, { color: colors.icon }]}>
-          Apply for our programs and become part of a global community of learners and achievers.
-        </ThemedText>
-        <TouchableOpacity 
-          style={[styles.ctaButton, { backgroundColor: colors.primary }]} 
-          onPress={openWebsite}
-        >
-          <ThemedText style={[styles.ctaButtonText, { color: 'white' }]}>
-            Apply Now
-          </ThemedText>
-        </TouchableOpacity>
-      </ThemedView>
+
     </ScrollView>
   );
 }

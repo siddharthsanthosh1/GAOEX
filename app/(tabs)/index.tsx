@@ -1,8 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Linking, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -52,85 +50,85 @@ export default function HomeScreen() {
         ]}
       >
         <View style={styles.heroContent}>
-          <ThemedText style={styles.heroTitle}>Global Academy Of Excellence</ThemedText>
-          <ThemedText style={styles.heroSubtitle}>
+          <Text style={styles.heroTitle}>Global Academy Of Excellence</Text>
+          <Text style={styles.heroSubtitle}>
             Empowering minds across the globe through quality education
-          </ThemedText>
+          </Text>
           <TouchableOpacity style={styles.ctaButton} onPress={openWebsite}>
-            <ThemedText style={styles.ctaButtonText}>Visit Website</ThemedText>
+            <Text style={styles.ctaButtonText}>Visit Website</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
 
       {/* Achievements Section */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
-          Center Achievements
-        </ThemedText>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}> 
+           Achievements
+        </Text>
         <View style={styles.achievementsContainer}>
           {achievements.map((achievement, index) => (
-            <View key={index} style={[styles.achievementCard, { backgroundColor: colors.card }]}>
-              <ThemedText style={[styles.achievementNumber, { color: colors.primary }]}>
+            <View key={index} style={[styles.achievementCard, { backgroundColor: colors.card }]}> 
+              <Text style={[styles.achievementNumber, { color: colors.primary }]}> 
                 {achievement.number}
-              </ThemedText>
-              <ThemedText style={[styles.achievementLabel, { color: colors.text }]}>
+              </Text>
+              <Text style={[styles.achievementLabel, { color: colors.text }]}> 
                 {achievement.label}
-              </ThemedText>
+              </Text>
             </View>
           ))}
         </View>
-      </ThemedView>
+      </View>
 
       {/* Featured Programs */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}> 
           Featured Programs
-        </ThemedText>
+        </Text>
         {featuredPrograms.map((program, index) => (
-          <View key={index} style={[styles.programCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View key={index} style={[styles.programCard, { backgroundColor: colors.card, borderColor: colors.border }]}> 
             <View style={styles.programHeader}>
-              <ThemedText style={styles.programIcon}>{program.icon}</ThemedText>
-              <ThemedText style={[styles.programTitle, { color: colors.text }]}>
+              <Text style={styles.programIcon}>{program.icon}</Text>
+              <Text style={[styles.programTitle, { color: colors.text }]}> 
                 {program.title}
-              </ThemedText>
+              </Text>
             </View>
-            <ThemedText style={[styles.programDescription, { color: colors.icon }]}>
+            <Text style={[styles.programDescription, { color: colors.icon }]}> 
               {program.description}
-            </ThemedText>
+            </Text>
           </View>
         ))}
-      </ThemedView>
+      </View>
 
       {/* Founder Quote */}
-      <ThemedView style={[styles.quoteSection, { backgroundColor: colors.card }]}>
-        <ThemedText style={[styles.quoteText, { color: colors.text }]}>
+      <View style={[styles.quoteSection, { backgroundColor: colors.card }]}> 
+        <Text style={[styles.quoteText, { color: colors.text }]}> 
           "Education has potential answers to all problems. Transfer of knowledge or imparting of education is the need of the hour to every deserving individual to obtain a deserved education which is uncategorized by money, race or caste or by any other social status."
-        </ThemedText>
-        <ThemedText style={[styles.quoteAuthor, { color: colors.primary }]}>
+        </Text>
+        <Text style={[styles.quoteAuthor, { color: colors.primary }]}> 
           — PRASHITHA AVINASH
-        </ThemedText>
-      </ThemedView>
+        </Text>
+      </View>
 
       {/* Awards Section */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}> 
           Recognition & Awards
-        </ThemedText>
-        <View style={[styles.awardsContainer, { backgroundColor: colors.card }]}>
-          <ThemedText style={[styles.awardItem, { color: colors.text }]}>
+        </Text>
+        <View style={[styles.awardsContainer, { backgroundColor: colors.card }]}> 
+          <Text style={[styles.awardItem, { color: colors.text }]}> 
             🏆 ISO Certified Educational Organization
-          </ThemedText>
-          <ThemedText style={[styles.awardItem, { color: colors.text }]}>
+          </Text>
+          <Text style={[styles.awardItem, { color: colors.text }]}> 
             ⭐ 5 Star Google Rated (GMB)
-          </ThemedText>
-          <ThemedText style={[styles.awardItem, { color: colors.text }]}>
+          </Text>
+          <Text style={[styles.awardItem, { color: colors.text }]}> 
             🏅 Asian Award Winner 2022
-          </ThemedText>
-          <ThemedText style={[styles.awardItem, { color: colors.text }]}>
+          </Text>
+          <Text style={[styles.awardItem, { color: colors.text }]}> 
             🎓 Students Choice Award 2022-2023
-          </ThemedText>
+          </Text>
         </View>
-      </ThemedView>
+      </View>
     </ScrollView>
   );
 }
@@ -158,6 +156,7 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     marginBottom: 20,
+    marginTop: 10,
     opacity: 0.9,
   },
   ctaButton: {
@@ -182,13 +181,17 @@ const styles = StyleSheet.create({
   achievementsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'stretch',
   },
   achievementCard: {
     flex: 1,
     alignItems: 'center',
-    padding: 20,
+    justifyContent: 'center',
+    paddingVertical: 20,
     marginHorizontal: 5,
     borderRadius: 12,
+    minWidth: 100,
+    maxWidth: 120,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -199,6 +202,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 5,
+    textAlign: 'center',
+    flexWrap: 'nowrap',
   },
   achievementLabel: {
     fontSize: 14,

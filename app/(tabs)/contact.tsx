@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { Alert, Linking, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -87,20 +85,20 @@ export default function ContactScreen() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ThemedView style={styles.header}>
-        <ThemedText style={[styles.headerTitle, { color: colors.text }]}>
+      <View style={styles.header}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
           Contact Us
-        </ThemedText>
-        <ThemedText style={[styles.headerSubtitle, { color: colors.icon }]}>
+        </Text>
+        <Text style={[styles.headerSubtitle, { color: colors.icon }]}>
           Get in touch with the Global Academy Of Excellence
-        </ThemedText>
-      </ThemedView>
+        </Text>
+      </View>
 
       {/* Contact Information */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Contact Information
-        </ThemedText>
+        </Text>
         {contactInfo.map((info, index) => (
           <TouchableOpacity
             key={index}
@@ -109,25 +107,25 @@ export default function ContactScreen() {
             disabled={!info.action}
           >
             <View style={styles.contactHeader}>
-              <ThemedText style={styles.contactIcon}>{info.icon}</ThemedText>
+              <Text style={styles.contactIcon}>{info.icon}</Text>
               <View style={styles.contactContent}>
-                <ThemedText style={[styles.contactTitle, { color: colors.text }]}>
+                <Text style={[styles.contactTitle, { color: colors.text }]}>
                   {info.title}
-                </ThemedText>
-                <ThemedText style={[styles.contactValue, { color: colors.primary }]}>
+                </Text>
+                <Text style={[styles.contactValue, { color: colors.primary }]}>
                   {info.value}
-                </ThemedText>
+                </Text>
               </View>
             </View>
           </TouchableOpacity>
         ))}
-      </ThemedView>
+      </View>
 
       {/* Social Media */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Follow Us
-        </ThemedText>
+        </Text>
         <View style={styles.socialGrid}>
           {socialMedia.map((social, index) => (
             <TouchableOpacity
@@ -135,25 +133,25 @@ export default function ContactScreen() {
               style={[styles.socialCard, { backgroundColor: colors.card, borderColor: colors.border }]}
               onPress={social.action}
             >
-              <ThemedText style={styles.socialIcon}>{social.icon}</ThemedText>
-              <ThemedText style={[styles.socialName, { color: colors.text }]}>
+              <Text style={styles.socialIcon}>{social.icon}</Text>
+              <Text style={[styles.socialName, { color: colors.text }]}>
                 {social.name}
-              </ThemedText>
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
-      </ThemedView>
+      </View>
 
       {/* Contact Form */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Send us a Message
-        </ThemedText>
-        <ThemedView style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        </Text>
+        <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.inputContainer}>
-            <ThemedText style={[styles.inputLabel, { color: colors.text }]}>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
               Name
-            </ThemedText>
+            </Text>
             <TextInput
               style={[styles.textInput, { 
                 backgroundColor: colors.background,
@@ -168,9 +166,9 @@ export default function ContactScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <ThemedText style={[styles.inputLabel, { color: colors.text }]}>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
               Email
-            </ThemedText>
+            </Text>
             <TextInput
               style={[styles.textInput, { 
                 backgroundColor: colors.background,
@@ -186,9 +184,9 @@ export default function ContactScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <ThemedText style={[styles.inputLabel, { color: colors.text }]}>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
               Message
-            </ThemedText>
+            </Text>
             <TextInput
               style={[styles.textArea, { 
                 backgroundColor: colors.background,
@@ -209,48 +207,48 @@ export default function ContactScreen() {
             style={[styles.submitButton, { backgroundColor: colors.primary }]} 
             onPress={handleSubmit}
           >
-            <ThemedText style={[styles.submitButtonText, { color: 'white' }]}>
+            <Text style={[styles.submitButtonText, { color: 'white' }]}>
               Send Message
-            </ThemedText>
+            </Text>
           </TouchableOpacity>
-        </ThemedView>
-      </ThemedView>
+        </View>
+      </View>
 
       {/* About Founder */}
-      <ThemedView style={styles.section}>
-        <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Our Founder
-        </ThemedText>
-        <ThemedView style={[styles.founderCard, { backgroundColor: colors.card }]}>
-          <ThemedText style={[styles.founderName, { color: colors.primary }]}>
+        </Text>
+        <View style={[styles.founderCard, { backgroundColor: colors.card }]}>
+          <Text style={[styles.founderName, { color: colors.primary }]}>
             Prashitha Avinash
-          </ThemedText>
-          <ThemedText style={[styles.founderTitle, { color: colors.text }]}>
+          </Text>
+          <Text style={[styles.founderTitle, { color: colors.text }]}>
             Founder & CEO, Global Academy Of Excellence
-          </ThemedText>
-          <ThemedText style={[styles.founderDescription, { color: colors.icon }]}>
+          </Text>
+          <Text style={[styles.founderDescription, { color: colors.icon }]}>
             International Educationist and visionary leader dedicated to making quality education accessible to all, regardless of background or circumstances.
-          </ThemedText>
-        </ThemedView>
-      </ThemedView>
+          </Text>
+        </View>
+      </View>
 
       {/* CTA Section */}
-      <ThemedView style={styles.ctaSection}>
-        <ThemedText style={[styles.ctaTitle, { color: colors.text }]}>
+      <View style={styles.ctaSection}>
+        <Text style={[styles.ctaTitle, { color: colors.text }]}>
           Ready to Get Started?
-        </ThemedText>
-        <ThemedText style={[styles.ctaDescription, { color: colors.icon }]}>
+        </Text>
+        <Text style={[styles.ctaDescription, { color: colors.icon }]}>
           Visit our website to learn more about our programs and services.
-        </ThemedText>
+        </Text>
         <TouchableOpacity 
           style={[styles.ctaButton, { backgroundColor: colors.primary }]} 
           onPress={openWebsite}
         >
-          <ThemedText style={[styles.ctaButtonText, { color: 'white' }]}>
+          <Text style={[styles.ctaButtonText, { color: 'white' }]}>
             Visit Website
-          </ThemedText>
+          </Text>
         </TouchableOpacity>
-      </ThemedView>
+      </View>
     </ScrollView>
   );
 }

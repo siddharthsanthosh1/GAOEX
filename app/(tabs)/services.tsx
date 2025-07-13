@@ -1,8 +1,6 @@
 import React from 'react';
-import { Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -85,57 +83,57 @@ export default function ServicesScreen() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ThemedView style={styles.header}>
-        <ThemedText style={[styles.headerTitle, { color: colors.text }]}>
+      <View style={styles.header}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
           Our Services
-        </ThemedText>
-        <ThemedText style={[styles.headerSubtitle, { color: colors.icon }]}>
+        </Text>
+        <Text style={[styles.headerSubtitle, { color: colors.icon }]}>
           Comprehensive educational solutions for global excellence
-        </ThemedText>
-      </ThemedView>
+        </Text>
+      </View>
 
       {services.map((service, index) => (
-        <ThemedView key={index} style={[styles.serviceCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View key={index} style={[styles.serviceCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.serviceHeader}>
-            <ThemedText style={styles.serviceIcon}>{service.icon}</ThemedText>
-            <ThemedText style={[styles.serviceTitle, { color: colors.text }]}>
+            <Text style={styles.serviceIcon}>{service.icon}</Text>
+            <Text style={[styles.serviceTitle, { color: colors.text }]}>
               {service.title}
-            </ThemedText>
+            </Text>
           </View>
           
-          <ThemedText style={[styles.serviceDescription, { color: colors.icon }]}>
+          <Text style={[styles.serviceDescription, { color: colors.icon }]}>
             {service.description}
-          </ThemedText>
+          </Text>
 
           <View style={styles.featuresContainer}>
             {service.features.map((feature, featureIndex) => (
               <View key={featureIndex} style={styles.featureItem}>
-                <ThemedText style={[styles.featureBullet, { color: colors.primary }]}>•</ThemedText>
-                <ThemedText style={[styles.featureText, { color: colors.text }]}>
+                <Text style={[styles.featureBullet, { color: colors.primary }]}>•</Text>
+                <Text style={[styles.featureText, { color: colors.text }]}>
                   {feature}
-                </ThemedText>
+                </Text>
               </View>
             ))}
           </View>
-        </ThemedView>
+        </View>
       ))}
 
-      <ThemedView style={styles.ctaSection}>
-        <ThemedText style={[styles.ctaTitle, { color: colors.text }]}>
+      <View style={styles.ctaSection}>
+        <Text style={[styles.ctaTitle, { color: colors.text }]}>
           Ready to Get Started?
-        </ThemedText>
-        <ThemedText style={[styles.ctaDescription, { color: colors.icon }]}>
+        </Text>
+        <Text style={[styles.ctaDescription, { color: colors.icon }]}>
           Contact us to learn more about our services and how we can help you achieve your educational goals.
-        </ThemedText>
+        </Text>
         <TouchableOpacity 
           style={[styles.ctaButton, { backgroundColor: colors.primary }]} 
           onPress={openWebsite}
         >
-          <ThemedText style={[styles.ctaButtonText, { color: 'white' }]}>
+          <Text style={[styles.ctaButtonText, { color: 'white' }]}>
             Contact Us
-          </ThemedText>
+          </Text>
         </TouchableOpacity>
-      </ThemedView>
+      </View>
     </ScrollView>
   );
 }
