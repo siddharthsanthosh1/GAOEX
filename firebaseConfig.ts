@@ -2,6 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkKByO4pqxkTRkS2ZMrbDdOJ2QvNi99aQ',
@@ -15,4 +16,5 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getDatabase(app, 'https://gaoex-e0c8b-default-rtdb.firebaseio.com/'); 
+export const db = getFirestore(app); // Firestore instance
+export const dbReal = getDatabase(app, 'https://gaoex-e0c8b-default-rtdb.firebaseio.com/'); 

@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { onAuthStateChanged } from 'firebase/auth';
-import { ref as dbRef, get, set } from 'firebase/database';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Calendar as CalendarComponent } from 'react-native-calendars';
@@ -20,9 +20,9 @@ interface EventType {
   category: string;
 }
 
-// Helper to get dates for July 12th to July 19th, 2024
+// Helper to get dates for July 12th to July 19th, 2025
 function getMockEventDates() {
-  const base = new Date(2024, 6, 12); // July is month 6 (0-indexed)
+  const base = new Date(2025, 6, 12); // July is month 6 (0-indexed)
   const dates = [];
   for (let i = 0; i < 8; i++) {
     const d = new Date(base);
@@ -148,7 +148,10 @@ export default function EventsPage() {
     eventDate.setHours(0,0,0,0);
     today.setHours(0,0,0,0);
     if (eventDate < today) {
-      Alert.alert('Registration Closed', 'You cannot register for past events.');
+      Alert.alert('Registration Closed', 'You cannot register for events that have already happened.');
+      return;
+    } else if (eventDate == today) {
+      Alert.alert('Registration Closed', 'You must register for events one day in advance.');
       return;
     }
     if (!user) {
@@ -161,19 +164,21 @@ export default function EventsPage() {
     }
     const registration = { ...event, name, phone };
     try {
-      const eventRef = dbRef(db, `users/${user.uid}/events/${event.id}`);
-      const snapshot = await get(eventRef);
-      if (snapshot.exists()) {
+      const eventDocRef = doc(db, 'users', user.uid, 'events', event.id);
+      const eventDoc = await getDoc(eventDocRef);
+      if (eventDoc.exists()) {
         Alert.alert('Already Registered', 'You have already registered for this event.');
         return;
       }
-      await set(eventRef, registration);
+      await setDoc(eventDocRef, registration);
       Alert.alert('Success', 'You are registered for this event!');
       setRegisteringEvent(null);
       setName('');
       setPhone('');
     } catch (e) {
-      Alert.alert('Error', 'Could not save registration.');
+      console.error(e);
+      const err = e as any;
+      Alert.alert('Error', err?.message || 'Could not save registration.');
     }
   };
 
@@ -184,7 +189,7 @@ export default function EventsPage() {
         <ThemedText style={[styles.headerSubtitle, { color: colors.icon }]}>See and register for upcoming events</ThemedText>
       </ThemedView>
       <CalendarComponent
-        current="2024-07-12"
+        current="2025-07-12"
         onDayPress={handleDayPress}
         markedDates={markedDates}
         theme={{

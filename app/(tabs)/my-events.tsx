@@ -4,22 +4,34 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { onValue, ref, remove } from 'firebase/database';
+import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { auth, db } from '../../firebaseConfig';
 
+interface EventType {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  category: string;
+  name?: string;
+  phone?: string;
+}
+
 export default function MyEventsPage() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
-  const [myEvents, setMyEvents] = useState([]);
+  const [myEvents, setMyEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null); // Use Firebase User type if available
   const [profileVisible, setProfileVisible] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: any) => {
       setUser(firebaseUser);
     });
     return unsubscribe;
@@ -33,14 +45,11 @@ export default function MyEventsPage() {
     }
     setLoading(true);
     setError('');
-    const eventsRef = ref(db, `users/${user.uid}/events`);
-    const unsubscribe = onValue(eventsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setMyEvents(Object.values(data));
-      } else {
-        setMyEvents([]);
-      }
+    const eventsColRef = collection(db, 'users', user.uid, 'events');
+    const unsubscribe = onSnapshot(eventsColRef, (snapshot) => {
+      const events: EventType[] = [];
+      snapshot.forEach(docSnap => events.push({ id: docSnap.id, ...docSnap.data() } as EventType));
+      setMyEvents(events);
       setLoading(false);
     }, (err) => {
       setError('You Currently Have No Events Registered');
@@ -49,15 +58,15 @@ export default function MyEventsPage() {
     return () => unsubscribe();
   }, [user]);
 
-  const handleRemove = async (event) => {
+  const handleRemove = async (event: EventType) => {
     if (!user) return;
     Alert.alert('Remove Event', 'Are you sure you want to remove this event from My Events?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Remove', style: 'destructive', onPress: async () => {
           try {
-            await remove(ref(db, `users/${user.uid}/events/${event.id}`));
-            // setMyEvents handled by onValue
+            await deleteDoc(doc(db, 'users', user.uid, 'events', event.id));
+            // setMyEvents handled by onSnapshot
           } catch {
             Alert.alert('Error', 'Could not remove event.');
           }
