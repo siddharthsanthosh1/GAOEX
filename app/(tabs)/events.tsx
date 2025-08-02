@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Calendar as CalendarComponent } from 'react-native-calendars';
@@ -22,7 +22,7 @@ interface EventType {
 
 // Helper to get dates for July 12th to July 19th, 2025
 function getMockEventDates() {
-  const base = new Date(2025, 6, 12); // July is month 6 (0-indexed)
+  const base = new Date(2025, 6, 28); // July is month 6 (0-indexed)
   const dates = [];
   for (let i = 0; i < 8; i++) {
     const d = new Date(base);
@@ -119,10 +119,26 @@ export default function EventsPage() {
   const [phone, setPhone] = useState('');
   const [registeringEvent, setRegisteringEvent] = useState<EventType | null>(null);
   const [user, setUser] = useState<any>(null); // Use Firebase User type if available
+  const [userRole, setUserRole] = useState<string | null>(null); // Track user role
 
   React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: any) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: any) => {
       setUser(firebaseUser);
+      if (firebaseUser) {
+        // Fetch user role from Firestore
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            setUserRole(userDoc.data().role || 'user');
+          } else {
+            setUserRole('user'); // Default to user if no doc
+          }
+        } catch (e) {
+          setUserRole('user');
+        }
+      } else {
+        setUserRole(null);
+      }
     });
     return unsubscribe;
   }, []);
@@ -162,6 +178,11 @@ export default function EventsPage() {
       Alert.alert('Error', 'Please enter your name and phone number.');
       return;
     }
+    // Validate phone number is exactly 10 digits
+    if (!/^\d{10}$/.test(phone)) {
+      Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number.');
+      return;
+    }
     const registration = { ...event, name, phone };
     try {
       const eventDocRef = doc(db, 'users', user.uid, 'events', event.id);
@@ -182,8 +203,41 @@ export default function EventsPage() {
     }
   };
 
+  // Admin-only: Add Event Modal state
+  const [addEventModal, setAddEventModal] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    description: '',
+    date: '',
+    time: '',
+    location: '',
+    category: '',
+  });
+  // Admin-only: Add Event handler
+  const handleAddEvent = async () => {
+    if (!newEvent.title || !newEvent.date) {
+      Alert.alert('Error', 'Title and date are required.');
+      return;
+    }
+    try {
+      // Add to Firestore events collection
+      await addDoc(collection(db, 'events'), newEvent);
+      Alert.alert('Success', 'Event added!');
+      setAddEventModal(false);
+      setNewEvent({ title: '', description: '', date: '', time: '', location: '', category: '' });
+    } catch (e) {
+      Alert.alert('Error', 'Could not add event.');
+    }
+  };
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
+      {/* Admin Add Event Button */}
+      {userRole === 'admin' && (
+        <TouchableOpacity style={[styles.registerButton, { backgroundColor: colors.primary, margin: 20 }]} onPress={() => setAddEventModal(true)}>
+          <ThemedText style={styles.registerButtonText}>Add Event</ThemedText>
+        </TouchableOpacity>
+      )}
       <ThemedView style={styles.header}>
         <ThemedText style={[styles.headerTitle, { color: colors.text }]}>Events Calendar</ThemedText>
         <ThemedText style={[styles.headerSubtitle, { color: colors.icon }]}>See and register for upcoming events</ThemedText>
@@ -247,16 +301,79 @@ export default function EventsPage() {
             />
             <TextInput
               style={[styles.input, { color: colors.text, borderColor: colors.border }]}
-              placeholder="Phone Number"
+              placeholder="Phone Number (10 digits)"
               placeholderTextColor={colors.icon}
               value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
+              onChangeText={(text) => {
+                // Only allow numbers and limit to 10 digits
+                const numericText = text.replace(/[^0-9]/g, '');
+                if (numericText.length <= 10) {
+                  setPhone(numericText);
+                }
+              }}
+              keyboardType="numeric"
+              maxLength={10}
             />
             <TouchableOpacity style={[styles.registerButton, { backgroundColor: colors.primary }]} onPress={() => handleRegister(registeringEvent!)}>
               <ThemedText style={styles.registerButtonText}>Submit</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setRegisteringEvent(null)} style={styles.closeButton}>
+              <ThemedText style={{ color: colors.primary, fontWeight: 'bold' }}>Cancel</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Add Event Modal (Admin only) */}
+      <Modal visible={addEventModal} transparent animationType="slide" onRequestClose={() => setAddEventModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}> 
+            <ThemedText style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 12, color: colors.primary }}>Add New Event</ThemedText>
+            <TextInput
+              style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+              placeholder="Title"
+              placeholderTextColor={colors.icon}
+              value={newEvent.title}
+              onChangeText={text => setNewEvent(ev => ({ ...ev, title: text }))}
+            />
+            <TextInput
+              style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+              placeholder="Description"
+              placeholderTextColor={colors.icon}
+              value={newEvent.description}
+              onChangeText={text => setNewEvent(ev => ({ ...ev, description: text }))}
+            />
+            <TextInput
+              style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+              placeholder="Date (YYYY-MM-DD)"
+              placeholderTextColor={colors.icon}
+              value={newEvent.date}
+              onChangeText={text => setNewEvent(ev => ({ ...ev, date: text }))}
+            />
+            <TextInput
+              style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+              placeholder="Time"
+              placeholderTextColor={colors.icon}
+              value={newEvent.time}
+              onChangeText={text => setNewEvent(ev => ({ ...ev, time: text }))}
+            />
+            <TextInput
+              style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+              placeholder="Location"
+              placeholderTextColor={colors.icon}
+              value={newEvent.location}
+              onChangeText={text => setNewEvent(ev => ({ ...ev, location: text }))}
+            />
+            <TextInput
+              style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+              placeholder="Category"
+              placeholderTextColor={colors.icon}
+              value={newEvent.category}
+              onChangeText={text => setNewEvent(ev => ({ ...ev, category: text }))}
+            />
+            <TouchableOpacity style={[styles.registerButton, { backgroundColor: colors.primary }]} onPress={handleAddEvent}>
+              <ThemedText style={styles.registerButtonText}>Add Event</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setAddEventModal(false)} style={styles.closeButton}>
               <ThemedText style={{ color: colors.primary, fontWeight: 'bold' }}>Cancel</ThemedText>
             </TouchableOpacity>
           </View>
@@ -278,7 +395,7 @@ const styles = StyleSheet.create({
   eventDate: { fontSize: 14, marginBottom: 2 },
   eventLocation: { fontSize: 14, marginBottom: 2 },
   eventDescription: { fontSize: 14, marginBottom: 8 },
-  registerButton: { paddingVertical: 8, borderRadius: 8, alignItems: 'center', marginTop: 8 },
+  registerButton: { paddingVertical: 16, paddingHorizontal: 24, borderRadius: 12, alignItems: 'center', marginTop: 16, width: '100%' },
   registerButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { width: 300, borderRadius: 16, padding: 24, backgroundColor: '#fff', alignItems: 'center' },

@@ -1,11 +1,10 @@
-import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { auth } from '../firebaseConfig';
 
 export default function LoginScreen() {
@@ -17,10 +16,23 @@ export default function LoginScreen() {
   const [errorMsg, setErrorMsg] = useState('');
   const router = useRouter();
 
+  const validateEmail = (email: string) => {
+    // Simple email regex
+    return /^\S+@\S+\.\S+$/.test(email);
+  };
+
   const handleAuth = async () => {
     setErrorMsg('');
     if (!email || !password) {
       setErrorMsg('Please enter both email and password.');
+      return;
+    }
+    if (!validateEmail(email)) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setErrorMsg('Password must be at least 6 characters.');
       return;
     }
     try {
@@ -29,7 +41,7 @@ export default function LoginScreen() {
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
-      router.replace('/onboarding');
+      router.replace('/home');
     } catch (e) {
       const err = e as any;
       if (err.code === 'auth/wrong-password') {
@@ -50,7 +62,7 @@ export default function LoginScreen() {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: colors.background }]}> 
-      <ThemedText style={[styles.title, { color: colors.primary }]}>GAOEX Login</ThemedText>
+      <Text style={[styles.title, { color: colors.primary }]}>GAOEX Login</Text>
       <TextInput
         style={[styles.input, { color: colors.text, borderColor: colors.border }]}
         placeholder="Email"
@@ -69,15 +81,15 @@ export default function LoginScreen() {
         secureTextEntry
       />
       {errorMsg ? (
-        <ThemedText style={{ color: '#fff', marginBottom: 8, alignSelf: 'flex-start' }}>{errorMsg}</ThemedText>
+        <Text style={{ color: '#fff', marginBottom: 8, alignSelf: 'flex-start' }}>{errorMsg}</Text>
       ) : null}
       <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleAuth}>
-        <ThemedText style={styles.buttonText}>{isSignup ? 'Sign Up' : 'Login'}</ThemedText>
+        <Text style={styles.buttonText}>{isSignup ? 'Sign Up' : 'Login'}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setIsSignup(!isSignup)}>
-        <ThemedText style={{ color: colors.primary, marginTop: 16 }}>
+        <Text style={{ color: colors.primary, marginTop: 16 }}>
           {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
-        </ThemedText>
+        </Text>
       </TouchableOpacity>
     </ThemedView>
   );
