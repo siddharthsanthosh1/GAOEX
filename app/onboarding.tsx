@@ -26,9 +26,9 @@ export default function OnboardingScreen() {
       }),
     ]).start(() => {
       if (auth.currentUser) {
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/home');
       } else {
-        router.replace('/login');
+        router.replace('/');
       }
     });
   }, []);

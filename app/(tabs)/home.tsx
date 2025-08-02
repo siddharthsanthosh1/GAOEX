@@ -1,12 +1,16 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'expo-router';
 
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { auth } from '../../firebaseConfig';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const router = useRouter();
 
   const achievements = [
     { number: '500+', label: 'Organizations' },
@@ -36,6 +40,31 @@ export default function HomeScreen() {
     Linking.openURL('https://www.gaoex.org');
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut(auth);
+              router.replace('/');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -54,9 +83,14 @@ export default function HomeScreen() {
           <Text style={styles.heroSubtitle}>
             Empowering minds across the globe through quality education
           </Text>
-          <TouchableOpacity style={styles.ctaButton} onPress={openWebsite}>
-            <Text style={styles.ctaButtonText}>Visit Website</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.ctaButton} onPress={openWebsite}>
+              <Text style={styles.ctaButtonText}>Visit Website</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </LinearGradient>
 
@@ -159,6 +193,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     opacity: 0.9,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 10,
+  },
   ctaButton: {
     backgroundColor: 'white',
     paddingHorizontal: 24,
@@ -167,6 +206,19 @@ const styles = StyleSheet.create({
   },
   ctaButtonText: {
     color: '#1e40af',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  logoutButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: 'white',
+  },
+  logoutButtonText: {
+    color: 'white',
     fontWeight: '600',
     fontSize: 16,
   },
